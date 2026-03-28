@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ayush Servers</title>
+    <title>Premium Study Notes</title>
     
     <!-- KaTeX CSS for Mathematical Equations -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -42,6 +42,27 @@
             min-height: 100vh;
         }
 
+        /* Top Navigation Bar */
+        .top-nav {
+            background: var(--bg-card);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .top-nav .logo {
+            font-family: 'Lora', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-nav .logo i { color: var(--accent); }
+
         main { flex: 1; max-width: 1000px; margin: 2rem auto 5rem auto; padding: 0 1rem; width: 100%; }
 
         /* Status Messages */
@@ -69,8 +90,8 @@
             background: var(--bg-card); border-radius: 20px; box-shadow: var(--shadow-float); 
             border: 1px solid rgba(0,0,0,0.03); 
         }
-        .extracted-header h1 { font-family: 'Lora', serif; font-size: clamp(2rem, 5vw, 2.5rem); color: var(--primary); }
-        .extracted-header p { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem;}
+        .extracted-header h1 { font-family: 'Lora', serif; font-size: clamp(2rem, 5vw, 2.5rem); color: var(--primary); line-height: 1.3;}
+        .extracted-header p { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 0.8rem;}
 
         /* Accordions */
         details { margin-bottom: 2rem; }
@@ -95,16 +116,58 @@
             background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 16px; 
             padding: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 1.5rem; box-shadow: var(--shadow-card); 
             transition: transform 0.3s; 
+            overflow: hidden; /* Prevent anything from breaking the card */
         }
         .question-block:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+        
         .question-heading { 
             color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; 
             border-bottom: 2px solid var(--border-soft); padding-bottom: 0.3rem; margin-bottom: 1.2rem; display: inline-block; 
         }
 
-        /* Text Styling */
+        /* --- TEXT & OVERFLOW FIXES FOR MATH/EQUATIONS --- */
+        .question-text, .answer-text {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+
         .question-text, .question-text * { color: var(--ink-black) !important; font-weight: 700 !important; font-size: 1.1rem; margin-bottom: 1rem; line-height: 1.6;}
         .answer-text, .answer-text * { color: var(--gel-blue) !important; font-weight: 500 !important; font-size: 1.05rem; margin-bottom: 1rem; line-height: 1.7;}
+
+        /* Safely handle long math formulas and chemical equations */
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            padding: 0.5rem 0;
+            display: block;
+        }
+        .katex {
+            max-width: 100%;
+            overflow-x: auto;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Custom elegant scrollbar for overflowing math/tables */
+        .katex-display::-webkit-scrollbar, .table-responsive::-webkit-scrollbar, .katex::-webkit-scrollbar {
+            height: 6px;
+        }
+        .katex-display::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb, .katex::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* Avoid image overflow */
+        .inline-image { margin: 2rem 0; text-align: center; }
+        .inline-image img { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border-soft); }
+        
+        /* Table overflow */
+        .table-responsive { overflow-x: auto; margin: 1.5rem 0; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-soft); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { border: 1px solid var(--border-soft); padding: 1rem; font-size: 0.95rem; }
+        th { background: #f8fafc; font-weight: 700; color: var(--primary); }
 
         .answer-badge { 
             display: inline-block; background: rgba(10, 64, 161, 0.08); color: var(--gel-blue); 
@@ -116,13 +179,6 @@
         .handwritten-mode .question-text, .handwritten-mode .question-text * { font-family: 'Caveat', cursive !important; font-size: 1.8rem !important; font-weight: 700 !important; line-height: 1.4; }
         .handwritten-mode .answer-text, .handwritten-mode .answer-text * { font-family: 'Caveat', cursive !important; font-size: 1.7rem !important; font-weight: 600 !important; line-height: 1.5; }
 
-        /* Elements */
-        .inline-image { margin: 2rem 0; text-align: center; }
-        .inline-image img { max-width: 100%; border-radius: 12px; border: 1px solid var(--border-soft); }
-        .table-responsive { overflow-x: auto; margin: 1.5rem 0; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-soft); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { border: 1px solid var(--border-soft); padding: 1rem; font-size: 0.95rem; }
-        th { background: #f8fafc; font-weight: 700; color: var(--primary); }
         a.anchor { display: none; }
 
         /* Floating Action Buttons */
@@ -153,7 +209,7 @@
         /* Clean Print/PDF Styles */
         @media print {
             body { background: white; color: black; background-image: none; display: block;}
-            .action-btn, footer { display: none !important; }
+            .top-nav, .action-btn, footer { display: none !important; }
             #content-card { box-shadow: none; border: none; padding: 0; display: block !important; animation: none;}
             .extracted-header { box-shadow: none; border: none; padding: 0 0 1.5rem 0; margin-bottom: 1.5rem; }
             .exercise-summary { background: white !important; border: 1px solid #ccc; color: black !important; box-shadow: none;}
@@ -161,10 +217,18 @@
             .question-block { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
             details { display: block; }
             .answer-badge { border: 1px solid #000; color: black; background: transparent; }
+            .katex-display, .katex { overflow: visible !important; white-space: normal !important; } /* Allow wrapping in PDF */
         }
     </style>
 </head>
 <body>
+
+    <!-- Minimal Premium Nav Bar -->
+    <nav class="top-nav">
+        <div class="logo">
+            <i class="fa-solid fa-book-open"></i> Premium Notes
+        </div>
+    </nav>
 
     <main>
         <!-- Floating Action Buttons -->
@@ -178,7 +242,7 @@
 
         <div id="loading" class="loader-container">
             <div class="spinner"></div>
-            <p>Connecting to Server...</p>
+            <p>Fetching and beautifully formatting your notes...</p>
         </div>
         
         <div id="error">
@@ -187,8 +251,8 @@
         
         <div id="content-card">
             <div class="extracted-header">
-                <h1 id="pageTitle">Chapter Title</h1>
-                <p id="pageSubtitle">Subtitle Info</p>
+                <h1 id="pageTitle">Loading...</h1>
+                <p id="pageSubtitle">Study Material</p>
             </div>
             
             <div id="extractedContent">
@@ -211,7 +275,7 @@
                 const targetUrl = 'https://www.knowledgeboat.com' + path;
                 fetchContent(targetUrl);
             } else {
-                showError("Content not found. ");
+                showError("Content not found. Please access this page using a valid chapter link.");
             }
         };
 
@@ -277,7 +341,7 @@
             const pageTitleText = doc.querySelector('h1')?.innerText || 'Chapter Notes';
             titleEl.innerText = pageTitleText;
             
-            // Set Website Title dynamically
+            // Set Website Tab Title dynamically
             document.title = pageTitleText + " | Premium Notes";
 
             const subtitleMatch = Array.from(doc.querySelectorAll('h2')).find(h => !h.closest('.markdown-body'));
