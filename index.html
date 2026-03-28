@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Notes Extractor</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-paper: #f9f8f4;
+            --bg-card: #ffffff;
+            --primary: #1e293b;
+            --accent: #b48c36;
+            --border-soft: #e2dfd5;
+            --ink-black: #111111;
+            --gel-blue: #0a40a1;
+            --shadow-float: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-paper);
+            color: var(--primary);
+            line-height: 1.7;
+            background-image: radial-gradient(#d5d0c4 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .hero { background: var(--bg-card); padding: clamp(2rem, 5vw, 3rem) 1.5rem; text-align: center; border-bottom: 1px solid var(--border-soft); }
+        .hero h1 { font-family: 'Lora', serif; font-size: clamp(2rem, 5vw, 2.5rem); color: var(--primary); }
+        .hero h1 i { color: var(--accent); }
+
+        .search-box {
+            display: flex; flex-wrap: wrap; gap: 10px; max-width: 700px; margin: 1.5rem auto 0 auto;
+            background: var(--bg-paper); padding: 0.5rem; border-radius: 12px; border: 1px solid var(--border-soft);
+        }
+        .search-box input { flex: 1 1 250px; background: transparent; border: none; padding: 1rem; color: var(--primary); font-size: 1rem; outline: none; }
+        .search-box button { background: var(--primary); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600; width: 100%;}
+        @media (min-width: 600px) { .search-box button { width: auto; } }
+        .search-box button:hover { background: var(--accent); }
+
+        main { flex: 1; max-width: 1000px; margin: 3rem auto; padding: 0 1rem; width: 100%; }
+
+        .loader-container, #error { display: none; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-soft); font-family: 'Lora', serif; font-size: 1.2rem; }
+        #error { color: #b91c1c; border-color: #fecaca; background: #fef2f2; }
+
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--border-soft); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #content-card { display: none; animation: fadeIn 0.8s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .extracted-header { text-align: center; margin-bottom: 3rem; padding: clamp(2rem, 5vw, 3rem); background: var(--bg-card); border-radius: 20px; box-shadow: var(--shadow-float); border: 1px solid rgba(0,0,0,0.03); }
+        .extracted-header h1 { font-family: 'Lora', serif; font-size: clamp(2rem, 5vw, 2.5rem); color: var(--primary); }
+        .extracted-header p { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem;}
+
+        details { margin-bottom: 2rem; }
+        summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        summary::-webkit-details-marker { display: none; }
+        
+        .exercise-summary { padding: clamp(1.2rem, 4vw, 1.5rem); background: var(--bg-card); border-radius: 16px; box-shadow: var(--shadow-card); font-family: 'Lora', serif; font-size: clamp(1.2rem, 4vw, 1.4rem); font-weight: 700; border: 1px solid var(--border-soft); position: relative; z-index: 2; }
+        .exercise-summary i { color: var(--accent); transition: transform 0.3s ease; }
+        .exercise-details[open] > .exercise-summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px dashed var(--border-soft); }
+        .exercise-details[open] > .exercise-summary i { transform: rotate(180deg); }
+        .exercise-content { background: var(--bg-paper); padding: clamp(1rem, 3vw, 2rem); border: 1px solid var(--border-soft); border-top: none; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+
+        .question-block { background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 16px; padding: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 1.5rem; box-shadow: var(--shadow-card); transition: transform 0.3s; }
+        .question-heading { color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid var(--border-soft); padding-bottom: 0.3rem; margin-bottom: 1.2rem; display: inline-block; }
+
+        .question-text, .question-text * { color: var(--ink-black) !important; font-weight: 700 !important; font-size: 1.1rem; margin-bottom: 1rem; line-height: 1.6;}
+        .answer-text, .answer-text * { color: var(--gel-blue) !important; font-weight: 500 !important; font-size: 1.05rem; margin-bottom: 1rem; line-height: 1.7;}
+
+        .answer-badge { display: inline-block; background: rgba(10, 64, 161, 0.08); color: var(--gel-blue); padding: 0.35rem 1rem; border-radius: 30px; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; margin: 1.5rem 0 1rem 0; }
+
+        /* Handwritten Mode */
+        .handwritten-mode .question-text, .handwritten-mode .question-text * { font-family: 'Caveat', cursive !important; font-size: 1.8rem !important; font-weight: 700 !important; line-height: 1.4; }
+        .handwritten-mode .answer-text, .handwritten-mode .answer-text * { font-family: 'Caveat', cursive !important; font-size: 1.7rem !important; font-weight: 600 !important; line-height: 1.5; }
+
+        .inline-image { margin: 2rem 0; text-align: center; }
+        .inline-image img { max-width: 100%; border-radius: 12px; border: 1px solid var(--border-soft); }
+        .table-responsive { overflow-x: auto; margin: 1.5rem 0; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-soft); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { border: 1px solid var(--border-soft); padding: 1rem; font-size: 0.95rem; }
+        th { background: #f8fafc; font-weight: 700; color: var(--primary); }
+        a.anchor { display: none; }
+
+        /* Action Buttons */
+        .action-btn { background: var(--bg-card); border: 2px solid var(--border-soft); color: var(--primary); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: all 0.3s; position: fixed; right: 2rem; z-index: 100;}
+        .action-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.1); }
+        
+        #hw-btn { bottom: 6rem; }
+        #hw-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        #pdf-btn { bottom: 2rem; background: var(--primary); color: white; border-color: var(--primary); }
+        #pdf-btn:hover { background: #16a34a; border-color: #16a34a;}
+
+        footer { text-align: center; padding: 2rem; font-weight: 600; color: #64748b; margin-top: auto; }
+        footer span { color: var(--accent); }
+
+        @media (max-width: 768px) {
+            .action-btn { right: 1rem; width: 45px; height: 45px; font-size: 1.1rem;}
+            #hw-btn { bottom: 4.5rem; }
+            #pdf-btn { bottom: 1rem; }
+        }
+
+        /* Clean Print/PDF Styles */
+        @media print {
+            body { background: white; color: black; background-image: none; display: block;}
+            .hero, .search-box, .action-btn, footer { display: none !important; }
+            #content-card { box-shadow: none; border: none; padding: 0; display: block !important; animation: none;}
+            .extracted-header { box-shadow: none; border: none; padding: 0 0 1.5rem 0; margin-bottom: 1.5rem; }
+            .exercise-summary { background: white !important; border: 1px solid #ccc; color: black !important; box-shadow: none;}
+            .exercise-content { border: 1px solid #ccc; border-top: none;}
+            .question-block { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+            details { display: block; }
+            .answer-badge { border: 1px solid #000; color: black; background: transparent; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1><i class="fa-solid fa-feather-pointed"></i> Artisan Extractor</h1>
+        <p>Elegantly crafted notes, meticulously structured.</p>
+        
+        <div class="search-box">
+            <input type="url" id="urlInput" placeholder="Enter full URL here..." autocomplete="off">
+            <button id="fetchBtn" onclick="handleManualFetch()">Fetch</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Floating Action Buttons -->
+        <button class="action-btn" id="hw-btn" onclick="toggleHandwriting()" title="Toggle Handwritten Style">
+            <i class="fa-solid fa-pen-fancy"></i>
+        </button>
+
+        <button class="action-btn" id="pdf-btn" onclick="downloadPDF()" title="Download as PDF">
+            <i class="fa-solid fa-file-pdf"></i>
+        </button>
+
+        <div id="loading" class="loader-container">
+            <div class="spinner"></div>
+            <p>Curating your beautifully formatted notes...</p>
+        </div>
+        
+        <div id="error">
+            <i class="fa-solid fa-triangle-exclamation"></i> <span id="errorText"></span>
+        </div>
+        
+        <div id="content-card">
+            <div class="extracted-header">
+                <h1 id="pageTitle">Chapter Title</h1>
+                <p id="pageSubtitle">Subtitle Info</p>
+            </div>
+            
+            <div id="extractedContent">
+                <!-- Parsed content injected here -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        Developed by <span>Ayush@8481</span>
+    </footer>
+
+    <script>
+        // Check URL on load to fetch automatically (e.g., my.vercel.app/learn/...)
+        window.onload = () => {
+            const path = window.location.pathname;
+            if (path && path.startsWith('/learn/')) {
+                const targetUrl = 'https://www.knowledgeboat.com' + path;
+                document.getElementById('urlInput').value = targetUrl;
+                fetchContent(targetUrl);
+            }
+        };
+
+        function handleManualFetch() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url || !url.startsWith('http')) {
+                showError("Please provide a valid HTTP/HTTPS URL.");
+                return;
+            }
+            fetchContent(url);
+        }
+
+        let isHandwritten = false;
+
+        function toggleHandwriting() {
+            const content = document.getElementById('extractedContent');
+            const btn = document.getElementById('hw-btn');
+            isHandwritten = !isHandwritten;
+            if(isHandwritten) {
+                content.classList.add('handwritten-mode');
+                btn.classList.add('active');
+            } else {
+                content.classList.remove('handwritten-mode');
+                btn.classList.remove('active');
+            }
+        }
+
+        function downloadPDF() {
+            // Open all accordions before printing so no content is hidden
+            document.querySelectorAll('details').forEach(detail => detail.setAttribute('open', 'true'));
+            setTimeout(() => window.print(), 300); // Slight delay to ensure UI updates
+        }
+
+        async function fetchContent(targetUrl) {
+            const btn = document.getElementById('fetchBtn');
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+            const contentCard = document.getElementById('content-card');
+            
+            errorDiv.style.display = 'none';
+            contentCard.style.display = 'none';
+            contentCard.style.animation = 'none';
+            loading.style.display = 'block';
+            btn.disabled = true;
+
+            try {
+                // Call our own Vercel API (No Codetabs)
+                const apiUrl = `/api/proxy?target=${encodeURIComponent(targetUrl)}`;
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) throw new Error(`Server returned status: ${response.status}`);
+                
+                const htmlString = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+
+                parseAndBuildUI(doc);
+
+            } catch (err) {
+                showError("Failed to fetch. Make sure the URL is correct. Details: " + err.message);
+            } finally {
+                loading.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        function parseAndBuildUI(doc) {
+            const contentCard = document.getElementById('content-card');
+            const titleEl = document.getElementById('pageTitle');
+            const subtitleEl = document.getElementById('pageSubtitle');
+            const contentEl = document.getElementById('extractedContent');
+            
+            contentEl.innerHTML = ''; 
+
+            titleEl.innerText = doc.querySelector('h1')?.innerText || 'Chapter Notes';
+            const subtitleMatch = Array.from(doc.querySelectorAll('h2')).find(h => !h.closest('.markdown-body'));
+            subtitleEl.innerText = subtitleMatch ? subtitleMatch.innerText : 'Study Material';
+
+            const article = doc.querySelector('.markdown-body');
+            if (!article) {
+                showError("Valid content structure not found. Ensure it's a valid KnowledgeBoat chapter URL.");
+                return;
+            }
+
+            article.querySelectorAll('ins, script, style, .adsbygoogle, iframe').forEach(el => el.remove());
+
+            const sections = article.querySelectorAll('section');
+
+            if (sections.length === 0) {
+                contentEl.innerHTML = article.innerHTML;
+            } else {
+                sections.forEach((sec, index) => {
+                    const h2 = sec.querySelector('h2');
+                    const sectionTitle = h2 ? h2.innerText : 'Exercise Section';
+
+                    const exDetails = document.createElement('details');
+                    exDetails.className = 'exercise-details';
+                    // Automatically open the first section
+                    if (index === 0) exDetails.setAttribute('open', 'true');
+                    
+                    const exSummary = document.createElement('summary');
+                    exSummary.className = 'exercise-summary';
+                    exSummary.innerHTML = `<span>${sectionTitle}</span><i class="fa-solid fa-angle-down"></i>`;
+                    exDetails.appendChild(exSummary);
+
+                    const exContent = document.createElement('div');
+                    exContent.className = 'exercise-content';
+
+                    let currentQBlock = null;
+                    let isAnswerPhase = false;
+
+                    Array.from(sec.children).forEach(child => {
+                        const h4 = child.tagName === 'H4' ? child : child.querySelector('h4');
+                        const isH2 = child.tagName === 'H2' || child.querySelector('h2');
+
+                        if (isH2) return; 
+
+                        if (h4) {
+                            currentQBlock = document.createElement('div');
+                            currentQBlock.className = 'question-block';
+                            exContent.appendChild(currentQBlock);
+
+                            const qHeading = document.createElement('div');
+                            qHeading.className = 'question-heading';
+                            qHeading.innerText = h4.innerText;
+                            currentQBlock.appendChild(qHeading);
+
+                            isAnswerPhase = false; 
+                        } 
+                        else if (currentQBlock) {
+                            const text = child.innerText.trim().toLowerCase();
+                            
+                            if (text === 'answer' || text === 'answer:') {
+                                isAnswerPhase = true;
+                                const badge = document.createElement('div');
+                                badge.className = 'answer-badge';
+                                badge.innerText = 'ANSWER'; 
+                                currentQBlock.appendChild(badge);
+                            } else {
+                                const clone = child.cloneNode(true);
+                                clone.querySelectorAll('a.anchor').forEach(a => a.remove());
+
+                                if (isAnswerPhase) {
+                                    clone.classList.add('answer-text');
+                                } else {
+                                    clone.classList.add('question-text');
+                                }
+
+                                if (clone.tagName === 'TABLE' || clone.querySelector('table')) {
+                                    const tableWrapper = document.createElement('div');
+                                    tableWrapper.className = 'table-responsive';
+                                    tableWrapper.appendChild(clone);
+                                    currentQBlock.appendChild(tableWrapper);
+                                } else {
+                                    currentQBlock.appendChild(clone);
+                                }
+                            }
+                        } else {
+                            const clone = child.cloneNode(true);
+                            clone.classList.add('question-text');
+                            exContent.appendChild(clone);
+                        }
+                    });
+
+                    exDetails.appendChild(exContent);
+                    contentEl.appendChild(exDetails);
+                });
+            }
+
+            contentCard.style.display = 'block';
+        }
+
+        function showError(msg) {
+            document.getElementById('errorText').innerText = msg;
+            document.getElementById('error').style.display = 'block';
+        }
+    </script>
+</body>
+  </html>
