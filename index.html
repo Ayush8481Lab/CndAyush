@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Notes Extractor</title>
+    <title>Premium Notes</title>
     
+    <!-- KaTeX CSS for Mathematical Equations -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -39,56 +42,81 @@
             min-height: 100vh;
         }
 
-        .hero { background: var(--bg-card); padding: clamp(2rem, 5vw, 3rem) 1.5rem; text-align: center; border-bottom: 1px solid var(--border-soft); }
-        .hero h1 { font-family: 'Lora', serif; font-size: clamp(2rem, 5vw, 2.5rem); color: var(--primary); }
-        .hero h1 i { color: var(--accent); }
+        main { flex: 1; max-width: 1000px; margin: 2rem auto 5rem auto; padding: 0 1rem; width: 100%; }
 
-        .search-box {
-            display: flex; flex-wrap: wrap; gap: 10px; max-width: 700px; margin: 1.5rem auto 0 auto;
-            background: var(--bg-paper); padding: 0.5rem; border-radius: 12px; border: 1px solid var(--border-soft);
+        /* Status Messages */
+        .loader-container, #error { 
+            display: none; text-align: center; padding: 4rem 2rem; 
+            background: var(--bg-card); border-radius: 16px; 
+            border: 1px solid var(--border-soft); box-shadow: var(--shadow-float);
+            font-family: 'Lora', serif; font-size: 1.2rem; margin-top: 2rem;
         }
-        .search-box input { flex: 1 1 250px; background: transparent; border: none; padding: 1rem; color: var(--primary); font-size: 1rem; outline: none; }
-        .search-box button { background: var(--primary); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600; width: 100%;}
-        @media (min-width: 600px) { .search-box button { width: auto; } }
-        .search-box button:hover { background: var(--accent); }
-
-        main { flex: 1; max-width: 1000px; margin: 3rem auto; padding: 0 1rem; width: 100%; }
-
-        .loader-container, #error { display: none; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-soft); font-family: 'Lora', serif; font-size: 1.2rem; }
         #error { color: #b91c1c; border-color: #fecaca; background: #fef2f2; }
 
-        .spinner { width: 40px; height: 40px; border: 3px solid var(--border-soft); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem auto; }
+        .spinner { 
+            width: 45px; height: 45px; border: 4px solid var(--border-soft); 
+            border-top-color: var(--accent); border-radius: 50%; 
+            animation: spin 1s linear infinite; margin: 0 auto 1.5rem auto; 
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Content Card */
         #content-card { display: none; animation: fadeIn 0.8s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .extracted-header { text-align: center; margin-bottom: 3rem; padding: clamp(2rem, 5vw, 3rem); background: var(--bg-card); border-radius: 20px; box-shadow: var(--shadow-float); border: 1px solid rgba(0,0,0,0.03); }
+        .extracted-header { 
+            text-align: center; margin-bottom: 3rem; padding: clamp(2rem, 5vw, 3rem); 
+            background: var(--bg-card); border-radius: 20px; box-shadow: var(--shadow-float); 
+            border: 1px solid rgba(0,0,0,0.03); 
+        }
         .extracted-header h1 { font-family: 'Lora', serif; font-size: clamp(2rem, 5vw, 2.5rem); color: var(--primary); }
         .extracted-header p { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem;}
 
+        /* Accordions */
         details { margin-bottom: 2rem; }
         summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         summary::-webkit-details-marker { display: none; }
         
-        .exercise-summary { padding: clamp(1.2rem, 4vw, 1.5rem); background: var(--bg-card); border-radius: 16px; box-shadow: var(--shadow-card); font-family: 'Lora', serif; font-size: clamp(1.2rem, 4vw, 1.4rem); font-weight: 700; border: 1px solid var(--border-soft); position: relative; z-index: 2; }
+        .exercise-summary { 
+            padding: clamp(1.2rem, 4vw, 1.5rem); background: var(--bg-card); border-radius: 16px; 
+            box-shadow: var(--shadow-card); font-family: 'Lora', serif; font-size: clamp(1.2rem, 4vw, 1.4rem); 
+            font-weight: 700; border: 1px solid var(--border-soft); position: relative; z-index: 2; 
+        }
         .exercise-summary i { color: var(--accent); transition: transform 0.3s ease; }
         .exercise-details[open] > .exercise-summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px dashed var(--border-soft); }
         .exercise-details[open] > .exercise-summary i { transform: rotate(180deg); }
-        .exercise-content { background: var(--bg-paper); padding: clamp(1rem, 3vw, 2rem); border: 1px solid var(--border-soft); border-top: none; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+        .exercise-content { 
+            background: var(--bg-paper); padding: clamp(1rem, 3vw, 2rem); border: 1px solid var(--border-soft); 
+            border-top: none; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; 
+        }
 
-        .question-block { background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 16px; padding: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 1.5rem; box-shadow: var(--shadow-card); transition: transform 0.3s; }
-        .question-heading { color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid var(--border-soft); padding-bottom: 0.3rem; margin-bottom: 1.2rem; display: inline-block; }
+        /* Question Blocks */
+        .question-block { 
+            background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 16px; 
+            padding: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 1.5rem; box-shadow: var(--shadow-card); 
+            transition: transform 0.3s; 
+        }
+        .question-block:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+        .question-heading { 
+            color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; 
+            border-bottom: 2px solid var(--border-soft); padding-bottom: 0.3rem; margin-bottom: 1.2rem; display: inline-block; 
+        }
 
+        /* Text Styling */
         .question-text, .question-text * { color: var(--ink-black) !important; font-weight: 700 !important; font-size: 1.1rem; margin-bottom: 1rem; line-height: 1.6;}
         .answer-text, .answer-text * { color: var(--gel-blue) !important; font-weight: 500 !important; font-size: 1.05rem; margin-bottom: 1rem; line-height: 1.7;}
 
-        .answer-badge { display: inline-block; background: rgba(10, 64, 161, 0.08); color: var(--gel-blue); padding: 0.35rem 1rem; border-radius: 30px; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; margin: 1.5rem 0 1rem 0; }
+        .answer-badge { 
+            display: inline-block; background: rgba(10, 64, 161, 0.08); color: var(--gel-blue); 
+            padding: 0.35rem 1rem; border-radius: 30px; font-weight: 800; font-size: 0.8rem; 
+            text-transform: uppercase; letter-spacing: 1.5px; margin: 2rem 0 1rem 0; 
+        }
 
         /* Handwritten Mode */
         .handwritten-mode .question-text, .handwritten-mode .question-text * { font-family: 'Caveat', cursive !important; font-size: 1.8rem !important; font-weight: 700 !important; line-height: 1.4; }
         .handwritten-mode .answer-text, .handwritten-mode .answer-text * { font-family: 'Caveat', cursive !important; font-size: 1.7rem !important; font-weight: 600 !important; line-height: 1.5; }
 
+        /* Elements */
         .inline-image { margin: 2rem 0; text-align: center; }
         .inline-image img { max-width: 100%; border-radius: 12px; border: 1px solid var(--border-soft); }
         .table-responsive { overflow-x: auto; margin: 1.5rem 0; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-soft); }
@@ -97,8 +125,13 @@
         th { background: #f8fafc; font-weight: 700; color: var(--primary); }
         a.anchor { display: none; }
 
-        /* Action Buttons */
-        .action-btn { background: var(--bg-card); border: 2px solid var(--border-soft); color: var(--primary); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: all 0.3s; position: fixed; right: 2rem; z-index: 100;}
+        /* Floating Action Buttons */
+        .action-btn { 
+            background: var(--bg-card); border: 2px solid var(--border-soft); color: var(--primary); 
+            width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            transition: all 0.3s; position: fixed; right: 2rem; z-index: 100;
+        }
         .action-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.1); }
         
         #hw-btn { bottom: 6rem; }
@@ -106,9 +139,11 @@
         #pdf-btn { bottom: 2rem; background: var(--primary); color: white; border-color: var(--primary); }
         #pdf-btn:hover { background: #16a34a; border-color: #16a34a;}
 
+        /* Footer */
         footer { text-align: center; padding: 2rem; font-weight: 600; color: #64748b; margin-top: auto; }
         footer span { color: var(--accent); }
 
+        /* Responsive */
         @media (max-width: 768px) {
             .action-btn { right: 1rem; width: 45px; height: 45px; font-size: 1.1rem;}
             #hw-btn { bottom: 4.5rem; }
@@ -118,7 +153,7 @@
         /* Clean Print/PDF Styles */
         @media print {
             body { background: white; color: black; background-image: none; display: block;}
-            .hero, .search-box, .action-btn, footer { display: none !important; }
+            .action-btn, footer { display: none !important; }
             #content-card { box-shadow: none; border: none; padding: 0; display: block !important; animation: none;}
             .extracted-header { box-shadow: none; border: none; padding: 0 0 1.5rem 0; margin-bottom: 1.5rem; }
             .exercise-summary { background: white !important; border: 1px solid #ccc; color: black !important; box-shadow: none;}
@@ -130,16 +165,6 @@
     </style>
 </head>
 <body>
-
-    <header class="hero">
-        <h1><i class="fa-solid fa-feather-pointed"></i> Artisan Extractor</h1>
-        <p>Elegantly crafted notes, meticulously structured.</p>
-        
-        <div class="search-box">
-            <input type="url" id="urlInput" placeholder="Enter full URL here..." autocomplete="off">
-            <button id="fetchBtn" onclick="handleManualFetch()">Fetch</button>
-        </div>
-    </header>
 
     <main>
         <!-- Floating Action Buttons -->
@@ -153,7 +178,7 @@
 
         <div id="loading" class="loader-container">
             <div class="spinner"></div>
-            <p>Curating your beautifully formatted notes...</p>
+            <p>Fetching and beautifully formatting your notes...</p>
         </div>
         
         <div id="error">
@@ -177,24 +202,18 @@
     </footer>
 
     <script>
-        // Check URL on load to fetch automatically (e.g., my.vercel.app/learn/...)
+        // Automatic fetching logic based on URL
         window.onload = () => {
             const path = window.location.pathname;
-            if (path && path.startsWith('/learn/')) {
+            
+            // Check if the URL contains '/learn/'
+            if (path && path.includes('/learn/')) {
                 const targetUrl = 'https://www.knowledgeboat.com' + path;
-                document.getElementById('urlInput').value = targetUrl;
                 fetchContent(targetUrl);
+            } else {
+                showError("Content not found. Please access this page using a valid chapter link.");
             }
         };
-
-        function handleManualFetch() {
-            const url = document.getElementById('urlInput').value.trim();
-            if (!url || !url.startsWith('http')) {
-                showError("Please provide a valid HTTP/HTTPS URL.");
-                return;
-            }
-            fetchContent(url);
-        }
 
         let isHandwritten = false;
 
@@ -214,23 +233,20 @@
         function downloadPDF() {
             // Open all accordions before printing so no content is hidden
             document.querySelectorAll('details').forEach(detail => detail.setAttribute('open', 'true'));
-            setTimeout(() => window.print(), 300); // Slight delay to ensure UI updates
+            setTimeout(() => window.print(), 300);
         }
 
         async function fetchContent(targetUrl) {
-            const btn = document.getElementById('fetchBtn');
             const loading = document.getElementById('loading');
             const errorDiv = document.getElementById('error');
             const contentCard = document.getElementById('content-card');
             
             errorDiv.style.display = 'none';
             contentCard.style.display = 'none';
-            contentCard.style.animation = 'none';
             loading.style.display = 'block';
-            btn.disabled = true;
 
             try {
-                // Call our own Vercel API (No Codetabs)
+                // Call our own Vercel API
                 const apiUrl = `/api/proxy?target=${encodeURIComponent(targetUrl)}`;
                 const response = await fetch(apiUrl);
                 
@@ -246,7 +262,6 @@
                 showError("Failed to fetch. Make sure the URL is correct. Details: " + err.message);
             } finally {
                 loading.style.display = 'none';
-                btn.disabled = false;
             }
         }
 
@@ -258,13 +273,19 @@
             
             contentEl.innerHTML = ''; 
 
-            titleEl.innerText = doc.querySelector('h1')?.innerText || 'Chapter Notes';
+            // Extract Title & Subtitle
+            const pageTitleText = doc.querySelector('h1')?.innerText || 'Chapter Notes';
+            titleEl.innerText = pageTitleText;
+            
+            // Set Website Title dynamically
+            document.title = pageTitleText + " | Premium Notes";
+
             const subtitleMatch = Array.from(doc.querySelectorAll('h2')).find(h => !h.closest('.markdown-body'));
             subtitleEl.innerText = subtitleMatch ? subtitleMatch.innerText : 'Study Material';
 
             const article = doc.querySelector('.markdown-body');
             if (!article) {
-                showError("Valid content structure not found. Ensure it's a valid KnowledgeBoat chapter URL.");
+                showError("Content structure not recognized. This URL might not be a valid chapter page.");
                 return;
             }
 
@@ -281,7 +302,7 @@
 
                     const exDetails = document.createElement('details');
                     exDetails.className = 'exercise-details';
-                    // Automatically open the first section
+                    // Open first exercise by default
                     if (index === 0) exDetails.setAttribute('open', 'true');
                     
                     const exSummary = document.createElement('summary');
@@ -362,4 +383,4 @@
         }
     </script>
 </body>
-  </html>
+</html>
