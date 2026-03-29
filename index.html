@@ -153,12 +153,24 @@
             padding-bottom: 0.5rem;
         }
 
-        /* Target lists inside answers */
-        .question-text ol, .question-text ul, .answer-text ol, .answer-text ul {
-            padding-left: 2rem;
-            margin-bottom: 1rem;
+        /* ======= FIXED: LIST NUMBER ALIGNMENT CLIPPING OVERRIDE ======= */
+        ol, ul {
+            padding-left: 2.5rem; /* Base fallback */
+            list-style-position: outside;
         }
-        .question-text li, .answer-text li { margin-bottom: 0.5rem; }
+        ol.question-text, ul.question-text, ol.answer-text, ul.answer-text,
+        .question-text ol, .question-text ul, .answer-text ol, .answer-text ul {
+            padding-left: 2.5rem !important; /* Critical to prevent clipping from overflow-x */
+            margin-bottom: 1.2rem;
+        }
+        .question-text li, .answer-text li, li.question-text, li.answer-text { 
+            margin-bottom: 0.8rem; 
+            padding-left: 0.3rem;
+        }
+        .question-text li > p, .answer-text li > p {
+            margin-bottom: 0; /* Remove double spacing inside list items */
+        }
+        /* ================================================================ */
 
         /* KaTeX Safe Modifications */
         .katex-mathml {
@@ -170,13 +182,20 @@
             display: inline-block;
             max-width: 100%;
         }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            padding: 1rem 0; /* Increased to prevent clipping tall square roots */
+            display: block;
+        }
         /* KnowledgeBoat Multi-line Math Fix */
         .katex-html { display: inline-block; }
         .katex .mspace.newline { display: block; margin-top: 0.5rem; } 
 
         /* Custom Scrollbar for overflowing math/tables */
-        .question-text::-webkit-scrollbar, .answer-text::-webkit-scrollbar, .table-responsive::-webkit-scrollbar { height: 6px; }
-        .question-text::-webkit-scrollbar-thumb, .answer-text::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        .question-text::-webkit-scrollbar, .answer-text::-webkit-scrollbar, .table-responsive::-webkit-scrollbar, .katex-display::-webkit-scrollbar { height: 6px; }
+        .question-text::-webkit-scrollbar-thumb, .answer-text::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb, .katex-display::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
 
         /* Media */
         .inline-image { margin: 1.5rem 0; text-align: center; }
@@ -301,7 +320,7 @@
         window.onload = () => {
             const path = window.location.pathname;
             
-            // For testing locally without an API proxy, you can comment this out and inject HTML directly
+            // Check if the URL contains '/learn/'
             if (path && path.includes('/learn/')) {
                 const targetUrl = 'https://www.knowledgeboat.com' + path;
                 fetchContent(targetUrl);
