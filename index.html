@@ -96,6 +96,59 @@
         .extracted-header h1 { font-family: 'Lora', serif; font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--primary); line-height: 1.3;}
         .extracted-header p { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 0.8rem;}
 
+        /* --- NEW: CHAPTER GRID LAYOUT --- */
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .chapter-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            box-shadow: var(--shadow-card);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .chapter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+            border-color: var(--accent);
+        }
+        .chapter-card .chap-num {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-card .chap-title {
+            font-size: 1.25rem;
+            font-family: 'Lora', serif;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+        .chapter-card .chap-icon {
+            margin-top: auto;
+            align-self: flex-end;
+            color: var(--border-soft);
+            font-size: 1.2rem;
+            transition: color 0.3s, transform 0.3s;
+        }
+        .chapter-card:hover .chap-icon {
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+
         /* Accordions */
         details { margin-bottom: 2rem; }
         summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
@@ -149,51 +202,36 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             max-width: 100%;
-            overflow-x: auto; /* Allow long equations to scroll horizontally */
+            overflow-x: auto;
             padding-bottom: 0.5rem;
         }
 
-        /* ======= FIXED: LIST NUMBER ALIGNMENT CLIPPING OVERRIDE ======= */
+        /* List Number Alignment Override */
         ol, ul {
-            padding-left: 2.5rem; /* Base fallback */
+            padding-left: 2.5rem;
             list-style-position: outside;
         }
         ol.question-text, ul.question-text, ol.answer-text, ul.answer-text,
         .question-text ol, .question-text ul, .answer-text ol, .answer-text ul {
-            padding-left: 2.5rem !important; /* Critical to prevent clipping from overflow-x */
+            padding-left: 2.5rem !important;
             margin-bottom: 1.2rem;
         }
         .question-text li, .answer-text li, li.question-text, li.answer-text { 
             margin-bottom: 0.8rem; 
             padding-left: 0.3rem;
         }
-        .question-text li > p, .answer-text li > p {
-            margin-bottom: 0; /* Remove double spacing inside list items */
-        }
-        /* ================================================================ */
+        .question-text li > p, .answer-text li > p { margin-bottom: 0; }
 
-        /* KaTeX Safe Modifications */
+        /* KaTeX Modifications */
         .katex-mathml {
-            /* Safely hide fallback MathML so it doesn't duplicate visually */
             position: absolute; clip: rect(1px, 1px, 1px, 1px); padding: 0; border: 0; height: 1px; width: 1px; overflow: hidden;
         }
-        .katex {
-            font-size: 1.15em !important; /* Scale math up beautifully */
-            display: inline-block;
-            max-width: 100%;
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            max-width: 100%;
-            padding: 1rem 0; /* Increased to prevent clipping tall square roots */
-            display: block;
-        }
-        /* KnowledgeBoat Multi-line Math Fix */
+        .katex { font-size: 1.15em !important; display: inline-block; max-width: 100%; }
+        .katex-display { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 1rem 0; display: block; }
         .katex-html { display: inline-block; }
         .katex .mspace.newline { display: block; margin-top: 0.5rem; } 
 
-        /* Custom Scrollbar for overflowing math/tables */
+        /* Custom Scrollbar */
         .question-text::-webkit-scrollbar, .answer-text::-webkit-scrollbar, .table-responsive::-webkit-scrollbar, .katex-display::-webkit-scrollbar { height: 6px; }
         .question-text::-webkit-scrollbar-thumb, .answer-text::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb, .katex-display::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
 
@@ -224,7 +262,7 @@
             line-height: 1.4; 
         }
         
-        /* VERY IMPORTANT: Revert KaTeX back to standard math font to prevent corruption */
+        /* Keep KaTeX standard in Handwritten mode */
         .handwritten-mode .katex {
             font-family: KaTeX_Main, 'Times New Roman', serif !important;
             font-size: 1.25rem !important; 
@@ -239,9 +277,9 @@
         }
         .action-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.1); }
         
-        #hw-btn { bottom: 6rem; }
+        #hw-btn { bottom: 6rem; display: none; }
         #hw-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-        #pdf-btn { bottom: 2rem; background: var(--primary); color: white; border-color: var(--primary); }
+        #pdf-btn { bottom: 2rem; background: var(--primary); color: white; border-color: var(--primary); display: none; }
         #pdf-btn:hover { background: #16a34a; border-color: #16a34a;}
 
         /* Footer */
@@ -253,6 +291,7 @@
             .action-btn { right: 1rem; width: 45px; height: 45px; font-size: 1.1rem;}
             #hw-btn { bottom: 4.5rem; }
             #pdf-btn { bottom: 1rem; }
+            .chapter-grid { grid-template-columns: 1fr; } /* Mobile Chapter Stack */
         }
 
         /* Clean Print/PDF Styles */
@@ -266,7 +305,6 @@
             .question-block { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; margin-bottom: 1rem;}
             details { display: block; margin-bottom: 1rem;}
             .answer-badge { border: 1px solid #000; color: black; background: transparent; }
-            /* Let Math flow naturally when printing instead of scrolling */
             .question-text, .answer-text, .katex-display, .katex { overflow: visible !important; white-space: normal !important; } 
         }
     </style>
@@ -281,7 +319,7 @@
     </nav>
 
     <main>
-        <!-- Floating Action Buttons -->
+        <!-- Floating Action Buttons (Hidden on Chapter List, Visible on Notes) -->
         <button class="action-btn" id="hw-btn" onclick="toggleHandwriting()" title="Toggle Handwritten Style">
             <i class="fa-solid fa-pen-fancy"></i>
         </button>
@@ -306,7 +344,7 @@
             </div>
             
             <div id="extractedContent">
-                <!-- Parsed content injected here -->
+                <!-- Parsed content (Grid or Notes) injected here -->
             </div>
         </div>
     </main>
@@ -316,17 +354,15 @@
     </footer>
 
     <script>
-        // Automatic fetching logic based on URL
+        // Universal fetching logic based on URL (handles both catalog and chapters)
         window.onload = () => {
             const path = window.location.pathname;
             
-            // Check if the URL contains '/learn/'
             if (path && path.includes('/learn/')) {
                 const targetUrl = 'https://www.knowledgeboat.com' + path;
                 fetchContent(targetUrl);
             } else {
-                // If loaded without path (e.g. locally), show a helpful message.
-                showError("Content not found. Please access this page using a valid chapter link via the server.");
+                showError("Content not found. Please access this page using a valid book or chapter link via the server.");
             }
         };
 
@@ -346,9 +382,7 @@
         }
 
         function downloadPDF() {
-            // Open all accordions before printing so no content is hidden
             document.querySelectorAll('details').forEach(detail => detail.setAttribute('open', 'true'));
-            // Wait slightly for DOM to expand before opening print dialog
             setTimeout(() => window.print(), 300);
         }
 
@@ -362,7 +396,7 @@
             loading.style.display = 'block';
 
             try {
-                // Call our own API
+                // Call Vercel Proxy
                 const apiUrl = `/api/proxy?target=${encodeURIComponent(targetUrl)}`;
                 const response = await fetch(apiUrl);
                 
@@ -390,112 +424,150 @@
             contentEl.innerHTML = ''; 
 
             // Extract Title & Subtitle safely
-            const pageTitleText = doc.querySelector('h1')?.innerText || 'Chapter Notes';
+            const pageTitleText = doc.querySelector('h1')?.innerText || 'Study Material';
             titleEl.innerText = pageTitleText;
             document.title = pageTitleText + " | Premium Notes";
 
-            const subtitleMatch = Array.from(doc.querySelectorAll('h2')).find(h => !h.closest('.markdown-body'));
-            subtitleEl.innerText = subtitleMatch ? subtitleMatch.innerText : 'Study Material';
-
+            // Identify Page Type: "Chapter Listing" vs "Chapter Content (Notes)"
             const article = doc.querySelector('.markdown-body');
-            if (!article) {
-                showError("Content structure not recognized. This URL might not be a valid chapter page.");
-                return;
-            }
+            
+            // Search for links that look like chapter cards
+            const chapterNodes = Array.from(doc.querySelectorAll('a')).filter(a => 
+                a.getAttribute('href') && 
+                a.getAttribute('href').includes('/solutions/') && 
+                a.querySelector('h3') && 
+                a.querySelector('h2')
+            );
 
-            // Remove clutter: Ads, Scripts, extraneous formatting lines
-            article.querySelectorAll('ins, script, style, .adsbygoogle, iframe, hr').forEach(el => el.remove());
+            // --- MODE 1: CATALOG / CHAPTER LISTING ---
+            if (chapterNodes.length > 0 && !article) {
+                subtitleEl.innerText = "Select a Chapter";
+                
+                // Hide writing tools
+                document.getElementById('hw-btn').style.display = 'none';
+                document.getElementById('pdf-btn').style.display = 'none';
 
-            const sections = article.querySelectorAll('section');
-
-            if (sections.length === 0) {
-                // Fallback if there are no sections formatted
-                contentEl.innerHTML = article.innerHTML;
-            } else {
-                sections.forEach((sec, index) => {
-                    const h2 = sec.querySelector('h2');
-                    const sectionTitle = h2 ? h2.innerText : 'Exercise Section';
-
-                    const exDetails = document.createElement('details');
-                    exDetails.className = 'exercise-details';
-                    if (index === 0) exDetails.setAttribute('open', 'true'); // Open first one
+                let gridHTML = '<div class="chapter-grid">';
+                
+                chapterNodes.forEach(node => {
+                    const chapNum = node.querySelector('h3').innerText.trim();
+                    const chapTitle = node.querySelector('h2').innerText.trim();
+                    // href remains relative, routing through your Vercel structure seamlessly
+                    const href = node.getAttribute('href'); 
                     
-                    const exSummary = document.createElement('summary');
-                    exSummary.className = 'exercise-summary';
-                    exSummary.innerHTML = `<span>${sectionTitle}</span><i class="fa-solid fa-angle-down"></i>`;
-                    exDetails.appendChild(exSummary);
+                    gridHTML += `
+                        <a href="${href}" class="chapter-card">
+                            <div class="chap-num">${chapNum}</div>
+                            <div class="chap-title">${chapTitle}</div>
+                            <div class="chap-icon"><i class="fa-solid fa-arrow-right-long"></i></div>
+                        </a>
+                    `;
+                });
+                
+                gridHTML += '</div>';
+                contentEl.innerHTML = gridHTML;
+            } 
+            
+            // --- MODE 2: CHAPTER NOTES / SOLUTIONS ---
+            else if (article) {
+                // Determine accurate subtitle for inner pages
+                const subtitleMatch = Array.from(doc.querySelectorAll('h2')).find(h => !h.closest('.markdown-body') && !h.closest('a'));
+                subtitleEl.innerText = subtitleMatch ? subtitleMatch.innerText : 'Study Material';
 
-                    const exContent = document.createElement('div');
-                    exContent.className = 'exercise-content';
+                // Reveal writing tools
+                document.getElementById('hw-btn').style.display = 'flex';
+                document.getElementById('pdf-btn').style.display = 'flex';
 
-                    let currentQBlock = null;
-                    let isAnswerPhase = false;
+                // Remove clutter
+                article.querySelectorAll('ins, script, style, .adsbygoogle, iframe, hr').forEach(el => el.remove());
 
-                    Array.from(sec.children).forEach(child => {
-                        const h4 = child.tagName === 'H4' ? child : child.querySelector('h4');
-                        const isH2 = child.tagName === 'H2' || child.querySelector('h2');
+                const sections = article.querySelectorAll('section');
 
-                        if (isH2) return; // Skip main section headings inside the block
+                if (sections.length === 0) {
+                    // Fallback formatting if no sections exist
+                    contentEl.innerHTML = article.innerHTML;
+                } else {
+                    sections.forEach((sec, index) => {
+                        const h2 = sec.querySelector('h2');
+                        const sectionTitle = h2 ? h2.innerText : 'Exercise Section';
 
-                        if (h4) {
-                            // Create a new card for every question
-                            currentQBlock = document.createElement('div');
-                            currentQBlock.className = 'question-block';
-                            exContent.appendChild(currentQBlock);
+                        const exDetails = document.createElement('details');
+                        exDetails.className = 'exercise-details';
+                        if (index === 0) exDetails.setAttribute('open', 'true'); 
+                        
+                        const exSummary = document.createElement('summary');
+                        exSummary.className = 'exercise-summary';
+                        exSummary.innerHTML = `<span>${sectionTitle}</span><i class="fa-solid fa-angle-down"></i>`;
+                        exDetails.appendChild(exSummary);
 
-                            const qHeading = document.createElement('div');
-                            qHeading.className = 'question-heading';
-                            qHeading.innerText = h4.innerText;
-                            currentQBlock.appendChild(qHeading);
+                        const exContent = document.createElement('div');
+                        exContent.className = 'exercise-content';
 
-                            isAnswerPhase = false; 
-                        } 
-                        else if (currentQBlock) {
-                            // Find where the Answer block begins
-                            const text = child.innerText.trim().toLowerCase();
-                            
-                            if (text === 'answer' || text === 'answer:') {
-                                isAnswerPhase = true;
-                                const badge = document.createElement('div');
-                                badge.className = 'answer-badge';
-                                badge.innerHTML = '<i class="fa-solid fa-check-circle"></i> Solution'; 
-                                currentQBlock.appendChild(badge);
+                        let currentQBlock = null;
+                        let isAnswerPhase = false;
+
+                        Array.from(sec.children).forEach(child => {
+                            const h4 = child.tagName === 'H4' ? child : child.querySelector('h4');
+                            const isH2 = child.tagName === 'H2' || child.querySelector('h2');
+
+                            if (isH2) return; 
+
+                            if (h4) {
+                                currentQBlock = document.createElement('div');
+                                currentQBlock.className = 'question-block';
+                                exContent.appendChild(currentQBlock);
+
+                                const qHeading = document.createElement('div');
+                                qHeading.className = 'question-heading';
+                                qHeading.innerText = h4.innerText;
+                                currentQBlock.appendChild(qHeading);
+
+                                isAnswerPhase = false; 
+                            } 
+                            else if (currentQBlock) {
+                                const text = child.innerText.trim().toLowerCase();
+                                
+                                if (text === 'answer' || text === 'answer:') {
+                                    isAnswerPhase = true;
+                                    const badge = document.createElement('div');
+                                    badge.className = 'answer-badge';
+                                    badge.innerHTML = '<i class="fa-solid fa-check-circle"></i> Solution'; 
+                                    currentQBlock.appendChild(badge);
+                                } else {
+                                    const clone = child.cloneNode(true);
+                                    clone.querySelectorAll('a.anchor').forEach(a => a.remove());
+
+                                    let finalElement = clone;
+
+                                    if (clone.tagName === 'TABLE' || clone.querySelector('table')) {
+                                        const tableWrapper = document.createElement('div');
+                                        tableWrapper.className = 'table-responsive';
+                                        tableWrapper.appendChild(clone);
+                                        finalElement = tableWrapper;
+                                    }
+
+                                    if (isAnswerPhase) {
+                                        finalElement.classList.add('answer-text');
+                                    } else {
+                                        finalElement.classList.add('question-text');
+                                    }
+
+                                    currentQBlock.appendChild(finalElement);
+                                }
                             } else {
                                 const clone = child.cloneNode(true);
-                                
-                                // Clean anchor tags (like #permalinks) usually embedded in headers
-                                clone.querySelectorAll('a.anchor').forEach(a => a.remove());
-
-                                let finalElement = clone;
-
-                                // Prevent tables from breaking mobile view
-                                if (clone.tagName === 'TABLE' || clone.querySelector('table')) {
-                                    const tableWrapper = document.createElement('div');
-                                    tableWrapper.className = 'table-responsive';
-                                    tableWrapper.appendChild(clone);
-                                    finalElement = tableWrapper;
-                                }
-
-                                // Apply specific styling classes based on the phase
-                                if (isAnswerPhase) {
-                                    finalElement.classList.add('answer-text');
-                                } else {
-                                    finalElement.classList.add('question-text');
-                                }
-
-                                currentQBlock.appendChild(finalElement);
+                                clone.classList.add('question-text');
+                                exContent.appendChild(clone);
                             }
-                        } else {
-                            // Elements outside a formal Question block (e.g., intro text)
-                            const clone = child.cloneNode(true);
-                            clone.classList.add('question-text');
-                            exContent.appendChild(clone);
-                        }
-                    });
+                        });
 
-                    exDetails.appendChild(exContent);
-                    contentEl.appendChild(exDetails);
-                });
+                        exDetails.appendChild(exContent);
+                        contentEl.appendChild(exDetails);
+                    });
+                }
+            } else {
+                showError("Content structure not recognized. This URL might not be a valid study material page.");
+                return;
             }
 
             contentCard.style.display = 'block';
