@@ -51,6 +51,9 @@
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         .top-nav .logo {
             font-family: 'Lora', serif;
@@ -90,7 +93,7 @@
             background: var(--bg-card); border-radius: 20px; box-shadow: var(--shadow-float); 
             border: 1px solid rgba(0,0,0,0.03); 
         }
-        .extracted-header h1 { font-family: 'Lora', serif; font-size: clamp(2rem, 5vw, 2.5rem); color: var(--primary); line-height: 1.3;}
+        .extracted-header h1 { font-family: 'Lora', serif; font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--primary); line-height: 1.3;}
         .extracted-header p { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 0.8rem;}
 
         /* Accordions */
@@ -116,7 +119,7 @@
             background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 16px; 
             padding: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 1.5rem; box-shadow: var(--shadow-card); 
             transition: transform 0.3s; 
-            overflow: hidden; /* Prevent anything from breaking the card */
+            overflow: hidden; 
         }
         .question-block:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
         
@@ -126,60 +129,87 @@
         }
 
         /* --- TEXT & OVERFLOW FIXES FOR MATH/EQUATIONS --- */
+        .question-text {
+            color: var(--ink-black); 
+            font-weight: 600; 
+            font-size: 1.05rem; 
+            margin-bottom: 1rem; 
+            line-height: 1.6;
+        }
+        .answer-text {
+            color: var(--gel-blue); 
+            font-weight: 500; 
+            font-size: 1.05rem; 
+            margin-bottom: 1rem; 
+            line-height: 1.7;
+        }
+
+        /* Prevent Text from Breaking Cards */
         .question-text, .answer-text {
             word-wrap: break-word;
             overflow-wrap: break-word;
             max-width: 100%;
+            overflow-x: auto; /* Allow long equations to scroll horizontally */
+            padding-bottom: 0.5rem;
         }
 
-        .question-text, .question-text * { color: var(--ink-black) !important; font-weight: 700 !important; font-size: 1.1rem; margin-bottom: 1rem; line-height: 1.6;}
-        .answer-text, .answer-text * { color: var(--gel-blue) !important; font-weight: 500 !important; font-size: 1.05rem; margin-bottom: 1rem; line-height: 1.7;}
+        /* Target lists inside answers */
+        .question-text ol, .question-text ul, .answer-text ol, .answer-text ul {
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        .question-text li, .answer-text li { margin-bottom: 0.5rem; }
 
-        /* Safely handle long math formulas and chemical equations */
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            max-width: 100%;
-            padding: 0.5rem 0;
-            display: block;
+        /* KaTeX Safe Modifications */
+        .katex-mathml {
+            /* Safely hide fallback MathML so it doesn't duplicate visually */
+            position: absolute; clip: rect(1px, 1px, 1px, 1px); padding: 0; border: 0; height: 1px; width: 1px; overflow: hidden;
         }
         .katex {
-            max-width: 100%;
-            overflow-x: auto;
+            font-size: 1.15em !important; /* Scale math up beautifully */
             display: inline-block;
-            vertical-align: middle;
+            max-width: 100%;
         }
+        /* KnowledgeBoat Multi-line Math Fix */
+        .katex-html { display: inline-block; }
+        .katex .mspace.newline { display: block; margin-top: 0.5rem; } 
 
-        /* Custom elegant scrollbar for overflowing math/tables */
-        .katex-display::-webkit-scrollbar, .table-responsive::-webkit-scrollbar, .katex::-webkit-scrollbar {
-            height: 6px;
-        }
-        .katex-display::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb, .katex::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 10px;
-        }
+        /* Custom Scrollbar for overflowing math/tables */
+        .question-text::-webkit-scrollbar, .answer-text::-webkit-scrollbar, .table-responsive::-webkit-scrollbar { height: 6px; }
+        .question-text::-webkit-scrollbar-thumb, .answer-text::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
 
-        /* Avoid image overflow */
-        .inline-image { margin: 2rem 0; text-align: center; }
+        /* Media */
+        .inline-image { margin: 1.5rem 0; text-align: center; }
         .inline-image img { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border-soft); }
         
-        /* Table overflow */
+        /* Table handling */
         .table-responsive { overflow-x: auto; margin: 1.5rem 0; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-soft); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
         th, td { border: 1px solid var(--border-soft); padding: 1rem; font-size: 0.95rem; }
         th { background: #f8fafc; font-weight: 700; color: var(--primary); }
 
+        /* Badge */
         .answer-badge { 
-            display: inline-block; background: rgba(10, 64, 161, 0.08); color: var(--gel-blue); 
-            padding: 0.35rem 1rem; border-radius: 30px; font-weight: 800; font-size: 0.8rem; 
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(10, 64, 161, 0.08); color: var(--gel-blue); 
+            padding: 0.4rem 1rem; border-radius: 30px; font-weight: 800; font-size: 0.8rem; 
             text-transform: uppercase; letter-spacing: 1.5px; margin: 2rem 0 1rem 0; 
         }
 
         /* Handwritten Mode */
-        .handwritten-mode .question-text, .handwritten-mode .question-text * { font-family: 'Caveat', cursive !important; font-size: 1.8rem !important; font-weight: 700 !important; line-height: 1.4; }
-        .handwritten-mode .answer-text, .handwritten-mode .answer-text * { font-family: 'Caveat', cursive !important; font-size: 1.7rem !important; font-weight: 600 !important; line-height: 1.5; }
-
-        a.anchor { display: none; }
+        .handwritten-mode .question-text, 
+        .handwritten-mode .answer-text { 
+            font-family: 'Caveat', cursive; 
+            font-size: 1.7rem; 
+            font-weight: 600; 
+            line-height: 1.4; 
+        }
+        
+        /* VERY IMPORTANT: Revert KaTeX back to standard math font to prevent corruption */
+        .handwritten-mode .katex {
+            font-family: KaTeX_Main, 'Times New Roman', serif !important;
+            font-size: 1.25rem !important; 
+        }
 
         /* Floating Action Buttons */
         .action-btn { 
@@ -214,10 +244,11 @@
             .extracted-header { box-shadow: none; border: none; padding: 0 0 1.5rem 0; margin-bottom: 1.5rem; }
             .exercise-summary { background: white !important; border: 1px solid #ccc; color: black !important; box-shadow: none;}
             .exercise-content { border: 1px solid #ccc; border-top: none;}
-            .question-block { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
-            details { display: block; }
+            .question-block { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; margin-bottom: 1rem;}
+            details { display: block; margin-bottom: 1rem;}
             .answer-badge { border: 1px solid #000; color: black; background: transparent; }
-            .katex-display, .katex { overflow: visible !important; white-space: normal !important; } /* Allow wrapping in PDF */
+            /* Let Math flow naturally when printing instead of scrolling */
+            .question-text, .answer-text, .katex-display, .katex { overflow: visible !important; white-space: normal !important; } 
         }
     </style>
 </head>
@@ -270,12 +301,13 @@
         window.onload = () => {
             const path = window.location.pathname;
             
-            // Check if the URL contains '/learn/'
+            // For testing locally without an API proxy, you can comment this out and inject HTML directly
             if (path && path.includes('/learn/')) {
                 const targetUrl = 'https://www.knowledgeboat.com' + path;
                 fetchContent(targetUrl);
             } else {
-                showError("Content not found. Please access this page using a valid chapter link.");
+                // If loaded without path (e.g. locally), show a helpful message.
+                showError("Content not found. Please access this page using a valid chapter link via the server.");
             }
         };
 
@@ -297,6 +329,7 @@
         function downloadPDF() {
             // Open all accordions before printing so no content is hidden
             document.querySelectorAll('details').forEach(detail => detail.setAttribute('open', 'true'));
+            // Wait slightly for DOM to expand before opening print dialog
             setTimeout(() => window.print(), 300);
         }
 
@@ -310,7 +343,7 @@
             loading.style.display = 'block';
 
             try {
-                // Call our own Vercel API
+                // Call our own API
                 const apiUrl = `/api/proxy?target=${encodeURIComponent(targetUrl)}`;
                 const response = await fetch(apiUrl);
                 
@@ -337,11 +370,9 @@
             
             contentEl.innerHTML = ''; 
 
-            // Extract Title & Subtitle
+            // Extract Title & Subtitle safely
             const pageTitleText = doc.querySelector('h1')?.innerText || 'Chapter Notes';
             titleEl.innerText = pageTitleText;
-            
-            // Set Website Tab Title dynamically
             document.title = pageTitleText + " | Premium Notes";
 
             const subtitleMatch = Array.from(doc.querySelectorAll('h2')).find(h => !h.closest('.markdown-body'));
@@ -353,11 +384,13 @@
                 return;
             }
 
-            article.querySelectorAll('ins, script, style, .adsbygoogle, iframe').forEach(el => el.remove());
+            // Remove clutter: Ads, Scripts, extraneous formatting lines
+            article.querySelectorAll('ins, script, style, .adsbygoogle, iframe, hr').forEach(el => el.remove());
 
             const sections = article.querySelectorAll('section');
 
             if (sections.length === 0) {
+                // Fallback if there are no sections formatted
                 contentEl.innerHTML = article.innerHTML;
             } else {
                 sections.forEach((sec, index) => {
@@ -366,8 +399,7 @@
 
                     const exDetails = document.createElement('details');
                     exDetails.className = 'exercise-details';
-                    // Open first exercise by default
-                    if (index === 0) exDetails.setAttribute('open', 'true');
+                    if (index === 0) exDetails.setAttribute('open', 'true'); // Open first one
                     
                     const exSummary = document.createElement('summary');
                     exSummary.className = 'exercise-summary';
@@ -384,9 +416,10 @@
                         const h4 = child.tagName === 'H4' ? child : child.querySelector('h4');
                         const isH2 = child.tagName === 'H2' || child.querySelector('h2');
 
-                        if (isH2) return; 
+                        if (isH2) return; // Skip main section headings inside the block
 
                         if (h4) {
+                            // Create a new card for every question
                             currentQBlock = document.createElement('div');
                             currentQBlock.className = 'question-block';
                             exContent.appendChild(currentQBlock);
@@ -399,34 +432,42 @@
                             isAnswerPhase = false; 
                         } 
                         else if (currentQBlock) {
+                            // Find where the Answer block begins
                             const text = child.innerText.trim().toLowerCase();
                             
                             if (text === 'answer' || text === 'answer:') {
                                 isAnswerPhase = true;
                                 const badge = document.createElement('div');
                                 badge.className = 'answer-badge';
-                                badge.innerText = 'ANSWER'; 
+                                badge.innerHTML = '<i class="fa-solid fa-check-circle"></i> Solution'; 
                                 currentQBlock.appendChild(badge);
                             } else {
                                 const clone = child.cloneNode(true);
+                                
+                                // Clean anchor tags (like #permalinks) usually embedded in headers
                                 clone.querySelectorAll('a.anchor').forEach(a => a.remove());
 
-                                if (isAnswerPhase) {
-                                    clone.classList.add('answer-text');
-                                } else {
-                                    clone.classList.add('question-text');
-                                }
+                                let finalElement = clone;
 
+                                // Prevent tables from breaking mobile view
                                 if (clone.tagName === 'TABLE' || clone.querySelector('table')) {
                                     const tableWrapper = document.createElement('div');
                                     tableWrapper.className = 'table-responsive';
                                     tableWrapper.appendChild(clone);
-                                    currentQBlock.appendChild(tableWrapper);
-                                } else {
-                                    currentQBlock.appendChild(clone);
+                                    finalElement = tableWrapper;
                                 }
+
+                                // Apply specific styling classes based on the phase
+                                if (isAnswerPhase) {
+                                    finalElement.classList.add('answer-text');
+                                } else {
+                                    finalElement.classList.add('question-text');
+                                }
+
+                                currentQBlock.appendChild(finalElement);
                             }
                         } else {
+                            // Elements outside a formal Question block (e.g., intro text)
                             const clone = child.cloneNode(true);
                             clone.classList.add('question-text');
                             exContent.appendChild(clone);
